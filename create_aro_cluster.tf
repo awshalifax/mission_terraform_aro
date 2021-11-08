@@ -1,5 +1,5 @@
 variable "deploy" {
-  description = "true = Create Cluster | False = Destroy cluster"
+  description = "true = Create Cluster | false = Destroy cluster"
 }
 
 locals { #testar sem isso aqui, colocar direto nos comandos
@@ -32,6 +32,12 @@ resource "null_resource" "create-cluster" {
 resource "null_resource" "delete-cluster" {
   count = var.deploy ? 0 : 1
   provisioner "local-exec" {
-    command = "az aro delete -n ${local.name} -g ${local.rg} --yes"
+    command = <<-EOT
+      exec "while [ "$(az resource list --name ${local.vnet})" != "[]" ]; do echo "waiting vnet deletion..."; sleep 5; done"
+      exec "az aro delete -n ${local.name} -g ${local.rg} --yes"
+  EOT    
   }
 }
+
+
+

@@ -44,7 +44,7 @@ az provider register -n Microsoft.Storage --wait
 ```bash
 # Run once before terraform apply, this script will create an Azure storage backend used by Terraform to store the state files
 ./create_backend.sh
-echo "Copy the putput to backend.tf!"
+echo "Copy the output to backend.tf!"
 ```
 
 
