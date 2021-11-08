@@ -3,11 +3,11 @@ variable "deploy" {
 }
 
 locals { #testar sem isso aqui, colocar direto nos comandos
-  ms     = azurerm_subnet.master-subnet.name
-  wk     = azurerm_subnet.worker-subnet.name
+  ms     = "master-sub"
+  wk     = "worker-sub"
   rg     = azurerm_resource_group.openshift-cluster.name
   loc    = var.location
-  vnet   = azurerm_virtual_network.virtual-network.name
+  vnet   = module.arovnet.vnet_name
   name   = "aro01"
   domain = azurerm_dns_zone.aro-dns-zone.name
 }
@@ -20,22 +20,19 @@ resource "null_resource" "create-cluster" {
   }
 
   depends_on = [
-    azurerm_subnet.master-subnet,
-    azurerm_subnet.worker-subnet,
-    azurerm_virtual_network.virtual-network,
-    azurerm_dns_zone.aro-dns-zone
+    azurerm_dns_zone.aro-dns-zone,
+    azurerm_resource_group.openshift-cluster,
+    module.arovnet
+
   ]
 
 }
 
 #az aro delete -n aro01 -g openshift-cluster-dev --yes
-resource "null_resource" "delete-cluster" {
+resource "null_resource" "delete" {
   count = var.deploy ? 0 : 1
   provisioner "local-exec" {
-    command = <<-EOT
-      exec "while [ "$(az resource list --name ${local.vnet})" != "[]" ]; do echo "waiting vnet deletion..."; sleep 5; done"
-      exec "az aro delete -n ${local.name} -g ${local.rg} --yes"
-  EOT    
+    command = "az aro delete -n ${local.name} -g ${local.rg} --yes"
   }
 }
 
