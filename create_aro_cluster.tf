@@ -1,5 +1,5 @@
 variable "deploy" {
-  description = "true = Create Cluster | false = Destroy cluster"
+  description = "true = Create cluster | false = Destroy cluster"
 }
 
 locals {

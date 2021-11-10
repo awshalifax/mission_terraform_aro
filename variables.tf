@@ -7,6 +7,7 @@ variable "workspace_to_environment_map" {
   }
 }
 
+#Cluster related configuration
 variable "location" {
   description = "The location where the resource group should be created"
   type        = string
